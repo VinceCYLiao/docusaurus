@@ -18,6 +18,7 @@ import {
   buildSshUrl,
   buildHttpsUrl,
   hasSSHProtocol,
+  isValidRelativePath,
 } from '../urlUtils';
 
 describe('normalizeUrl', () => {
@@ -310,5 +311,20 @@ describe('hasSSHProtocol', () => {
   it('does not recognize plain HTTPS URL', () => {
     const url = 'https://github.com:5433/facebook/docusaurus.git';
     expect(hasSSHProtocol(url)).toBe(false);
+  });
+});
+
+describe('isValidRelativePath', () => {
+  it('works', () => {
+    expect(isValidRelativePath('https://docusaurus.io/blog')).toBe(false);
+    expect(isValidRelativePath('notValidhttps://')).toBe(false);
+    expect(isValidRelativePath('#hash')).toBe(false);
+    expect(isValidRelativePath('/#hash')).toBe(true);
+    expect(isValidRelativePath('/blog')).toBe(true);
+    expect(isValidRelativePath('blog/my-first-blog')).toBe(true);
+    expect(isValidRelativePath('/blog///valid//')).toBe(true);
+    expect(isValidRelativePath('/blog/hi#你好')).toBe(true);
+    expect(isValidRelativePath('')).toBe(true);
+    expect(isValidRelativePath('/blog?qs=ho')).toBe(true);
   });
 });

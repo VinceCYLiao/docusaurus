@@ -54,6 +54,7 @@ export {
   hasSSHProtocol,
   buildHttpsUrl,
   buildSshUrl,
+  isValidRelativePath,
 } from './urlUtils';
 export {
   type Tag,

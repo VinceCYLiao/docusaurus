@@ -9,7 +9,11 @@ import path from 'path';
 import fs from 'fs-extra';
 import logger from '@docusaurus/logger';
 import {Feed, type Author as FeedAuthor} from 'feed';
-import {normalizeUrl, readOutputHTMLFile} from '@docusaurus/utils';
+import {
+  isValidRelativePath,
+  normalizeUrl,
+  readOutputHTMLFile,
+} from '@docusaurus/utils';
 import {blogPostContainerID} from '@docusaurus/utils-common';
 import {load as cheerioLoad} from 'cheerio';
 import type {DocusaurusConfig} from '@docusaurus/types';
@@ -104,6 +108,20 @@ async function defaultCreateFeedItems({
         siteConfig.trailingSlash,
       );
       const $ = cheerioLoad(content);
+
+      // Prefix the relative paths with url defined in config
+      // leave the anchors and external links untouched
+      // (e.g. href that starts with "#", "http://" or "https://")
+      $(`div#${blogPostContainerID} a`).each((_, elm) => {
+        const {href} = elm.attribs;
+        if (href) {
+          if (isValidRelativePath(href)) {
+            // a valid relative url path might not have leading slash
+            elm.attribs.href =
+              siteConfig.url + href.startsWith('/') ? href : `/${href}`;
+          }
+        }
+      });
 
       const link = normalizeUrl([siteUrl, permalink]);
       const feedItem: BlogFeedItem = {
