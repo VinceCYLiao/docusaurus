@@ -234,23 +234,13 @@ export function hasSSHProtocol(sourceRepoUrl: string): boolean {
 }
 
 /**
- * Whether the str is a valid relative url path
+ * Whether the str is a relative url path
  */
-export function isValidRelativePath(str: string): boolean {
-  // When str starts with "#", the parsedPath will be "/#xxx"
-  // and the functions will return true while this is not a relative path
-  // so an early return is required here
-  if (str.startsWith('#')) {
-    return false;
-  }
+export function isRelativePath(str: string): boolean {
   try {
-    const urlObj = new URL(str, 'https://domain.com');
-    const parsedPath = `${urlObj.pathname}${urlObj.hash}`;
-    const strToCompare = (str.startsWith('/') ? str : `/${str}`).split('?')[0];
-    return (
-      parsedPath === strToCompare ||
-      parsedPath === encodeURI(strToCompare ?? '')
-    );
+    const domain = 'https://domain.com';
+    const urlObj = new URL(str, domain);
+    return urlObj.origin === domain;
   } catch {
     return false;
   }

@@ -18,7 +18,7 @@ import {
   buildSshUrl,
   buildHttpsUrl,
   hasSSHProtocol,
-  isValidRelativePath,
+  isRelativePath,
 } from '../urlUtils';
 
 describe('normalizeUrl', () => {
@@ -314,17 +314,17 @@ describe('hasSSHProtocol', () => {
   });
 });
 
-describe('isValidRelativePath', () => {
+describe('isRelativePath', () => {
   it('works', () => {
-    expect(isValidRelativePath('https://docusaurus.io/blog')).toBe(false);
-    expect(isValidRelativePath('notValidhttps://')).toBe(false);
-    expect(isValidRelativePath('#hash')).toBe(false);
-    expect(isValidRelativePath('/#hash')).toBe(true);
-    expect(isValidRelativePath('/blog')).toBe(true);
-    expect(isValidRelativePath('blog/my-first-blog')).toBe(true);
-    expect(isValidRelativePath('/blog///valid//')).toBe(true);
-    expect(isValidRelativePath('/blog/hi#你好')).toBe(true);
-    expect(isValidRelativePath('')).toBe(true);
-    expect(isValidRelativePath('/blog?qs=ho')).toBe(true);
+    expect(isRelativePath('https://docusaurus.io/blog')).toBe(false);
+    expect(isRelativePath('notValidhttps://')).toBe(false);
+    expect(isRelativePath('#hash')).toBe(true);
+    expect(isRelativePath('/#hash')).toBe(true);
+    expect(isRelativePath('/blog')).toBe(true);
+    expect(isRelativePath('blog/my-first-blog')).toBe(true);
+    expect(isRelativePath('/blog///valid//')).toBe(true);
+    expect(isRelativePath('/blog/hi#你好')).toBe(true);
+    expect(isRelativePath('')).toBe(true);
+    expect(isRelativePath('/blog?qs=ho')).toBe(true);
   });
 });

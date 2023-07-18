@@ -10,7 +10,7 @@ import fs from 'fs-extra';
 import logger from '@docusaurus/logger';
 import {Feed, type Author as FeedAuthor} from 'feed';
 import {
-  isValidRelativePath,
+  isRelativePath,
   normalizeUrl,
   readOutputHTMLFile,
 } from '@docusaurus/utils';
@@ -109,21 +109,20 @@ async function defaultCreateFeedItems({
       );
       const $ = cheerioLoad(content);
 
+      const link = normalizeUrl([siteUrl, permalink]);
+
       // Prefix the relative paths with url defined in config
       // leave the anchors and external links untouched
       // (e.g. href that starts with "#", "http://" or "https://")
       $(`div#${blogPostContainerID} a`).each((_, elm) => {
         const {href} = elm.attribs;
-        if (href) {
-          if (isValidRelativePath(href)) {
-            // a valid relative url path might not have leading slash
-            elm.attribs.href =
-              siteConfig.url + href.startsWith('/') ? href : `/${href}`;
-          }
+        if (href && isRelativePath(href)) {
+            elm.attribs.href = String(
+              new URL(href.startsWith('/') ? siteConfig.url : permalink, href),
+            );
         }
       });
 
-      const link = normalizeUrl([siteUrl, permalink]);
       const feedItem: BlogFeedItem = {
         title: metadataTitle,
         id: link,
@@ -210,7 +209,8 @@ export async function createBlogFeedFiles({
   if (!feed || !feedTypes) {
     return;
   }
-
+  console.log("options", options);
+  console.log("ourDir", outDir);
   await Promise.all(
     feedTypes.map((feedType) =>
       createBlogFeedFile({
